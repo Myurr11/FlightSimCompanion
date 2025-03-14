@@ -26,7 +26,7 @@ class FlightPlan(models.Model):
     arrival = models.ForeignKey(Airport, related_name='arrival_flights', on_delete=models.CASCADE)
     aircraft = models.ForeignKey(Aircraft, on_delete=models.CASCADE)
     fuel_required = models.FloatField()
-    distance = models.FloatField()
+    distance = models.FloatField()  # Add this field
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

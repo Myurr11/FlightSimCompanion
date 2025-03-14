@@ -5,6 +5,19 @@
 </head>
 <body>
     <h1>Welcome to Flight Sim Companion!</h1>
-    <p>Plan your flights with ease.</p>
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.username }}!</p>
+        <a href="{% url 'plan_flight' %}">Plan a New Flight</a>
+        <h2>Your Flight Plans</h2>
+        <ul>
+            {% for plan in flight_plans %}
+                <li>
+                    {{ plan.departure }} to {{ plan.arrival }} ({{ plan.aircraft }})
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> or <a href="{% url 'signup' %}">Sign Up</a> to start planning flights.</p>
+    {% endif %}
 </body>
 </html>
