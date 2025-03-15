@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from .forms import FlightPlanForm
@@ -48,3 +48,7 @@ def plan_flight(request):
     else:
         form = FlightPlanForm()
     return render(request, 'flight_planner/plan_flight.html', {'form': form})
+
+def flight_detail(request, flight_id):
+    flight = get_object_or_404(FlightPlan, id=flight_id)
+    return render(request, 'flight_planner/flight_detail.html', {'flight': flight})

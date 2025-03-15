@@ -12,7 +12,9 @@
         <ul>
             {% for plan in flight_plans %}
                 <li>
-                    {{ plan.departure }} to {{ plan.arrival }} ({{ plan.aircraft }})
+                    <a href="{% url 'flight_detail' plan.id %}">
+                        {{ plan.departure }} to {{ plan.arrival }} ({{ plan.aircraft }})
+                    </a>
                 </li>
             {% endfor %}
         </ul>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flight Details</title>
+</head>
+<body>
+    <h1>Flight Details</h1>
+    <p><strong>Departure:</strong> {{ flight.departure }}</p>
+    <p><strong>Arrival:</strong> {{ flight.arrival }}</p>
+    <p><strong>Aircraft:</strong> {{ flight.aircraft }}</p>
+    <p><strong>Distance:</strong> {{ flight.distance }} km</p>
+    <p><strong>Fuel Required:</strong> {{ flight.fuel_required }} lbs</p>
+    <p><strong>Created At:</strong> {{ flight.created_at }}</p>
+    <a href="{% url 'home' %}">Back to Home</a>
+</body>
+</html>
