@@ -4,6 +4,10 @@ from django.contrib.auth import login
 from .forms import FlightPlanForm
 from .models import FlightPlan
 from .utils import calculate_distance
+import requests
+import folium
+from folium.plugins import AntPath
+from django.conf import settings
 
 def home(request):
     if request.user.is_authenticated:
@@ -49,6 +53,97 @@ def plan_flight(request):
         form = FlightPlanForm()
     return render(request, 'flight_planner/plan_flight.html', {'form': form})
 
+def get_weather(lat, lon):
+    api_key = settings.OPENWEATHERMAP_API_KEY  # Use the API key from settings
+    url = f'http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric'
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather data: {e}")
+        return None
+
 def flight_detail(request, flight_id):
     flight = get_object_or_404(FlightPlan, id=flight_id)
-    return render(request, 'flight_planner/flight_detail.html', {'flight': flight})
+
+    # Get weather for departure and arrival airports
+    departure_weather = get_weather(flight.departure.latitude, flight.departure.longitude)
+    arrival_weather = get_weather(flight.arrival.latitude, flight.arrival.longitude)
+
+    # Create a map centered between the departure and arrival airports
+    map_center = [
+        (flight.departure.latitude + flight.arrival.latitude) / 2,
+        (flight.departure.longitude + flight.arrival.longitude) / 2,
+    ]
+    flight_map = folium.Map(location=map_center, zoom_start=4)
+
+    # Add markers for departure and arrival airports
+    folium.Marker(
+        [flight.departure.latitude, flight.departure.longitude],
+        tooltip=f"Departure: {flight.departure}",
+    ).add_to(flight_map)
+
+    folium.Marker(
+        [flight.arrival.latitude, flight.arrival.longitude],
+        tooltip=f"Arrival: {flight.arrival}",
+    ).add_to(flight_map)
+
+    # Add a line connecting the departure and arrival airports
+    AntPath(
+        locations=[
+            [flight.departure.latitude, flight.departure.longitude],
+            [flight.arrival.latitude, flight.arrival.longitude],
+        ],
+        color='blue',
+        dash_array=[10, 20],
+    ).add_to(flight_map)
+
+    # Render the map to HTML
+    flight_map = flight_map._repr_html_()  # Convert the map to HTML
+
+    return render(request, 'flight_planner/flight_detail.html', {
+        'flight': flight,
+        'departure_weather': departure_weather,
+        'arrival_weather': arrival_weather,
+        'flight_map': flight_map,  # Pass the map HTML to the template
+    })
+
+def flight_map(request, flight_id):
+    flight = get_object_or_404(FlightPlan, id=flight_id)
+
+    # Create a map centered between the departure and arrival airports
+    map_center = [
+        (flight.departure.latitude + flight.arrival.latitude) / 2,
+        (flight.departure.longitude + flight.arrival.longitude) / 2,
+    ]
+    flight_map = folium.Map(location=map_center, zoom_start=4)
+
+    # Add markers for departure and arrival airports
+    folium.Marker(
+        [flight.departure.latitude, flight.departure.longitude],
+        tooltip=f"Departure: {flight.departure}",
+    ).add_to(flight_map)
+
+    folium.Marker(
+        [flight.arrival.latitude, flight.arrival.longitude],
+        tooltip=f"Arrival: {flight.arrival}",
+    ).add_to(flight_map)
+
+    # Add a line connecting the departure and arrival airports
+    AntPath(
+        locations=[
+            [flight.departure.latitude, flight.departure.longitude],
+            [flight.arrival.latitude, flight.arrival.longitude],
+        ],
+        color='blue',
+        dash_array=[10, 20],
+    ).add_to(flight_map)
+
+    # Render the map to HTML
+    flight_map_html = flight_map._repr_html_()
+
+    return render(request, 'flight_planner/flight_map.html', {
+        'flight_map': flight_map_html,
+        'flight': flight,  # Pass the flight object to the template
+    })

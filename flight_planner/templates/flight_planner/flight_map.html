@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flight Route Map</title>
+</head>
+<body>
+    <h1>Flight Route Map</h1>
+    {{ flight_map|safe }}
+    <a href="{% url 'flight_detail' flight.id %}">Back to Flight Details</a>
+</body>
+</html>

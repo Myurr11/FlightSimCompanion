@@ -11,6 +11,27 @@
     <p><strong>Distance:</strong> {{ flight.distance }} km</p>
     <p><strong>Fuel Required:</strong> {{ flight.fuel_required }} lbs</p>
     <p><strong>Created At:</strong> {{ flight.created_at }}</p>
+
+    <h2>Weather Information</h2>
+    <h3>Departure Weather</h3>
+    {% if departure_weather %}
+        <p><strong>Temperature:</strong> {{ departure_weather.main.temp }}°C</p>
+        <p><strong>Conditions:</strong> {{ departure_weather.weather.0.description }}</p>
+    {% else %}
+        <p>Weather data not available.</p>
+    {% endif %}
+
+    <h3>Arrival Weather</h3>
+    {% if arrival_weather %}
+        <p><strong>Temperature:</strong> {{ arrival_weather.main.temp }}°C</p>
+        <p><strong>Conditions:</strong> {{ arrival_weather.weather.0.description }}</p>
+    {% else %}
+        <p>Weather data not available.</p>
+    {% endif %}
+
+    <h2>Route Map</h2>
+    <iframe src="{% url 'flight_map' flight.id %}" width="100%" height="500px"></iframe>
+
     <a href="{% url 'home' %}">Back to Home</a>
 </body>
 </html>
